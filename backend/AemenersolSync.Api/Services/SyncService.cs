@@ -1,7 +1,6 @@
 using AemenersolSync.Api.Dtos;
 using AemenersolSync.Api.Hubs;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
 
 namespace AemenersolSync.Api.Services;
 
@@ -11,20 +10,17 @@ public class SyncService : ISyncService
     private readonly IPlatformWellRepository _repository;
     private readonly ISyncTokenStore _tokenStore;
     private readonly IHubContext<SyncHub> _hubContext;
-    private readonly ILogger<SyncService>? _logger;
 
     public SyncService(
         IAemenersolClient client,
         IPlatformWellRepository repository,
         ISyncTokenStore tokenStore,
-        IHubContext<SyncHub> hubContext,
-        ILogger<SyncService>? logger = null)
+        IHubContext<SyncHub> hubContext)
     {
         _client = client;
         _repository = repository;
         _tokenStore = tokenStore;
         _hubContext = hubContext;
-        _logger = logger;
     }
 
     public async Task<SyncResultDto> RunSyncAsync(bool useDummyEndpoint = false)
