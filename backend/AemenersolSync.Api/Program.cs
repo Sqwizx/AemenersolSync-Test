@@ -32,8 +32,10 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<InMemorySyncTokenCache>();
 builder.Services.AddScoped<ISyncTokenStore, SessionSyncTokenStore>();
 builder.Services.AddScoped<ISyncService, SyncService>();
+builder.Services.AddHostedService<SyncBackgroundService>();
 
 builder.Services.AddCors(options =>
 {

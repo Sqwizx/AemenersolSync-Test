@@ -2,20 +2,16 @@ namespace AemenersolSync.Api.Services;
 
 public class SessionSyncTokenStore : ISyncTokenStore
 {
-    private const string TokenKey = "AemenersolToken";
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly InMemorySyncTokenCache _cache;
 
-    public SessionSyncTokenStore(IHttpContextAccessor httpContextAccessor)
+    public SessionSyncTokenStore(InMemorySyncTokenCache cache)
     {
-        _httpContextAccessor = httpContextAccessor;
+        _cache = cache;
     }
 
-    public string? GetToken() =>
-        _httpContextAccessor.HttpContext?.Session.GetString(TokenKey);
+    public string? GetToken() => _cache.GetToken();
 
-    public void SetToken(string token) =>
-        _httpContextAccessor.HttpContext?.Session.SetString(TokenKey, token);
+    public void SetToken(string token) => _cache.SetToken(token);
 
-    public void ClearToken() =>
-        _httpContextAccessor.HttpContext?.Session.Remove(TokenKey);
+    public void ClearToken() => _cache.ClearToken();
 }
