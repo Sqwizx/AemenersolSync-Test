@@ -33,6 +33,19 @@ public class SyncServiceTests
 
         client.Verify(c => c.LoginAsync(), Times.Once);
         tokenStore.Verify(t => t.SetToken("new-token"), Times.Once);
+
+        clientProxy.Verify(
+            c => c.SendCoreAsync(
+                "syncCompleted",
+                It.Is<object?[]>(args =>
+                    args.Length == 1 &&
+                    args[0] as SyncResultDto != null &&
+                    ((SyncResultDto)args[0]!).PlatformsInserted == 0 &&
+                    ((SyncResultDto)args[0]!).PlatformsUpdated == 0 &&
+                    ((SyncResultDto)args[0]!).WellsInserted == 0 &&
+                    ((SyncResultDto)args[0]!).WellsUpdated == 0),
+                default),
+            Times.Once);
     }
 
     [Fact]
@@ -49,13 +62,27 @@ public class SyncServiceTests
             .ReturnsAsync(new UpsertResult(0, 0, 0, 0));
 
         var hubContext = new Mock<IHubContext<SyncHub>>();
-        hubContext.Setup(h => h.Clients.All).Returns(Mock.Of<IClientProxy>());
+        var clientProxy = new Mock<IClientProxy>();
+        hubContext.Setup(h => h.Clients.All).Returns(clientProxy.Object);
 
         var service = new SyncService(client.Object, repo.Object, tokenStore.Object, hubContext.Object);
 
         await service.RunSyncAsync();
 
         client.Verify(c => c.LoginAsync(), Times.Never);
+
+        clientProxy.Verify(
+            c => c.SendCoreAsync(
+                "syncCompleted",
+                It.Is<object?[]>(args =>
+                    args.Length == 1 &&
+                    args[0] as SyncResultDto != null &&
+                    ((SyncResultDto)args[0]!).PlatformsInserted == 0 &&
+                    ((SyncResultDto)args[0]!).PlatformsUpdated == 0 &&
+                    ((SyncResultDto)args[0]!).WellsInserted == 0 &&
+                    ((SyncResultDto)args[0]!).WellsUpdated == 0),
+                default),
+            Times.Once);
     }
 
     [Fact]
@@ -70,13 +97,28 @@ public class SyncServiceTests
 
         var repo = new Mock<IPlatformWellRepository>();
         var hubContext = new Mock<IHubContext<SyncHub>>();
-        hubContext.Setup(h => h.Clients.All).Returns(Mock.Of<IClientProxy>());
+        var clientProxy = new Mock<IClientProxy>();
+        hubContext.Setup(h => h.Clients.All).Returns(clientProxy.Object);
 
         var service = new SyncService(client.Object, repo.Object, tokenStore.Object, hubContext.Object);
 
         await Assert.ThrowsAsync<AemenersolUnauthorizedException>(() => service.RunSyncAsync());
 
         tokenStore.Verify(t => t.ClearToken(), Times.Once);
+
+        clientProxy.Verify(
+            c => c.SendCoreAsync(
+                "unauthorized",
+                It.Is<object?[]>(args => args.Length == 0),
+                default),
+            Times.Once);
+
+        clientProxy.Verify(
+            c => c.SendCoreAsync(
+                "syncCompleted",
+                It.IsAny<object?[]>(),
+                default),
+            Times.Never);
     }
 
     [Fact]
@@ -93,7 +135,8 @@ public class SyncServiceTests
             .ReturnsAsync(new UpsertResult(0, 0, 0, 0));
 
         var hubContext = new Mock<IHubContext<SyncHub>>();
-        hubContext.Setup(h => h.Clients.All).Returns(Mock.Of<IClientProxy>());
+        var clientProxy = new Mock<IClientProxy>();
+        hubContext.Setup(h => h.Clients.All).Returns(clientProxy.Object);
 
         var service = new SyncService(client.Object, repo.Object, tokenStore.Object, hubContext.Object);
 
@@ -101,5 +144,18 @@ public class SyncServiceTests
 
         client.Verify(c => c.GetPlatformWellDummyAsync("token"), Times.Once);
         client.Verify(c => c.GetPlatformWellActualAsync(It.IsAny<string>()), Times.Never);
+
+        clientProxy.Verify(
+            c => c.SendCoreAsync(
+                "syncCompleted",
+                It.Is<object?[]>(args =>
+                    args.Length == 1 &&
+                    args[0] as SyncResultDto != null &&
+                    ((SyncResultDto)args[0]!).PlatformsInserted == 0 &&
+                    ((SyncResultDto)args[0]!).PlatformsUpdated == 0 &&
+                    ((SyncResultDto)args[0]!).WellsInserted == 0 &&
+                    ((SyncResultDto)args[0]!).WellsUpdated == 0),
+                default),
+            Times.Once);
     }
 }
