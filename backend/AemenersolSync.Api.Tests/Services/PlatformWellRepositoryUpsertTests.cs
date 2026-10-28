@@ -115,6 +115,32 @@ public class PlatformWellRepositoryUpsertTests
     }
 
     [Fact]
+    public async Task UpsertPlatformsAsync_ExistingWell_ReSyncsPlatformId()
+    {
+        using var context = CreateInMemoryContext();
+        context.Platforms.Add(new Platform { Id = 1, UniqueName = "P1" });
+        context.Platforms.Add(new Platform { Id = 2, UniqueName = "P2" });
+        context.Wells.Add(new Well { Id = 10, PlatformId = 1, UniqueName = "W10" });
+        await context.SaveChangesAsync();
+        var repo = new PlatformWellRepository(context);
+
+        var dto = new PlatformDto
+        {
+            Id = 2,
+            UniqueName = "P2",
+            Well = new List<WellDto>
+            {
+                new() { Id = 10, PlatformId = 2, UniqueName = "W10" }
+            }
+        };
+
+        await repo.UpsertPlatformsAsync(new List<PlatformDto> { dto });
+
+        var saved = await context.Wells.FindAsync(10);
+        Assert.Equal(2, saved!.PlatformId);
+    }
+
+    [Fact]
     public async Task UpsertPlatformsAsync_RecordMissingId_IsSkippedWithoutThrowing()
     {
         using var context = CreateInMemoryContext();

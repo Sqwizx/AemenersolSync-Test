@@ -82,6 +82,7 @@ public class PlatformWellRepository : IPlatformWellRepository
 
     private static void ApplyWellFields(Well well, WellDto dto)
     {
+        well.PlatformId = dto.PlatformId;
         if (dto.UniqueName is not null) well.UniqueName = dto.UniqueName;
         if (dto.Latitude is not null) well.Latitude = dto.Latitude;
         if (dto.Longitude is not null) well.Longitude = dto.Longitude;
