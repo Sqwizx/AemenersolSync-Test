@@ -19,6 +19,8 @@ builder.Services.AddHttpClient<IAemenersolClient, AemenersolClient>(client =>
     client.BaseAddress = new Uri(builder.Configuration["Aemenersol:BaseUrl"]!);
 });
 
+builder.Services.AddScoped<IPlatformWellRepository, PlatformWellRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
