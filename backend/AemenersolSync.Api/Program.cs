@@ -32,6 +32,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<InMemorySyncTokenCache>();
 builder.Services.AddScoped<ISyncTokenStore, SessionSyncTokenStore>();
+builder.Services.AddScoped<IPlatformWellRepository, PlatformWellRepository>();
 builder.Services.AddScoped<ISyncService, SyncService>();
 builder.Services.AddHostedService<SyncBackgroundService>();
 

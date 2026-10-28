@@ -1,7 +1,5 @@
-using AemenersolSync.Api.Data;
 using AemenersolSync.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace AemenersolSync.Api.Controllers;
 
@@ -10,12 +8,12 @@ namespace AemenersolSync.Api.Controllers;
 public class SyncController : ControllerBase
 {
     private readonly ISyncService _syncService;
-    private readonly AppDbContext _context;
+    private readonly IPlatformWellRepository _repository;
 
-    public SyncController(ISyncService syncService, AppDbContext context)
+    public SyncController(ISyncService syncService, IPlatformWellRepository repository)
     {
         _syncService = syncService;
-        _context = context;
+        _repository = repository;
     }
 
     [HttpPost]
@@ -35,11 +33,7 @@ public class SyncController : ControllerBase
     [HttpGet("data")]
     public async Task<IActionResult> GetData()
     {
-        var platforms = await _context.Platforms
-            .Include(p => p.Wells)
-            .AsNoTracking()
-            .ToListAsync();
-
+        var platforms = await _repository.GetAllPlatformsWithWellsAsync();
         return Ok(platforms);
     }
 }

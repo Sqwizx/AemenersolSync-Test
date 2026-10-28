@@ -1,9 +1,7 @@
-using AemenersolSync.Api.Data;
 using AemenersolSync.Api.Dtos;
 using AemenersolSync.Api.Hubs;
 using AemenersolSync.Api.Services;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 
@@ -11,19 +9,11 @@ namespace AemenersolSync.Api.Tests.Services;
 
 public class SyncServiceTests
 {
-    private static AppDbContext CreateInMemoryContext()
-    {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .Options;
-        return new AppDbContext(options);
-    }
+    private static readonly UpsertResult EmptyUpsertResult = new(0, 0, 0, 0);
 
     [Fact]
     public async Task RunSyncAsync_NoStoredToken_LogsInFirst()
     {
-        using var context = CreateInMemoryContext();
-
         var tokenStore = new Mock<ISyncTokenStore>();
         tokenStore.Setup(t => t.GetToken()).Returns((string?)null);
 
@@ -31,11 +21,14 @@ public class SyncServiceTests
         client.Setup(c => c.LoginAsync()).ReturnsAsync("new-token");
         client.Setup(c => c.GetPlatformWellActualAsync("new-token")).ReturnsAsync(new List<PlatformDto>());
 
+        var repository = new Mock<IPlatformWellRepository>();
+        repository.Setup(r => r.UpsertPlatformsAsync(It.IsAny<List<PlatformDto>>())).ReturnsAsync(EmptyUpsertResult);
+
         var hubContext = new Mock<IHubContext<SyncHub>>();
         var clientProxy = new Mock<IClientProxy>();
         hubContext.Setup(h => h.Clients.All).Returns(clientProxy.Object);
 
-        var service = new SyncService(client.Object, context, tokenStore.Object, hubContext.Object);
+        var service = new SyncService(client.Object, repository.Object, tokenStore.Object, hubContext.Object);
 
         await service.RunSyncAsync();
 
@@ -59,19 +52,20 @@ public class SyncServiceTests
     [Fact]
     public async Task RunSyncAsync_StoredToken_SkipsLogin()
     {
-        using var context = CreateInMemoryContext();
-
         var tokenStore = new Mock<ISyncTokenStore>();
         tokenStore.Setup(t => t.GetToken()).Returns("existing-token");
 
         var client = new Mock<IAemenersolClient>();
         client.Setup(c => c.GetPlatformWellActualAsync("existing-token")).ReturnsAsync(new List<PlatformDto>());
 
+        var repository = new Mock<IPlatformWellRepository>();
+        repository.Setup(r => r.UpsertPlatformsAsync(It.IsAny<List<PlatformDto>>())).ReturnsAsync(EmptyUpsertResult);
+
         var hubContext = new Mock<IHubContext<SyncHub>>();
         var clientProxy = new Mock<IClientProxy>();
         hubContext.Setup(h => h.Clients.All).Returns(clientProxy.Object);
 
-        var service = new SyncService(client.Object, context, tokenStore.Object, hubContext.Object);
+        var service = new SyncService(client.Object, repository.Object, tokenStore.Object, hubContext.Object);
 
         await service.RunSyncAsync();
 
@@ -94,8 +88,6 @@ public class SyncServiceTests
     [Fact]
     public async Task RunSyncAsync_UpstreamUnauthorized_ClearsTokenAndRethrows()
     {
-        using var context = CreateInMemoryContext();
-
         var tokenStore = new Mock<ISyncTokenStore>();
         tokenStore.Setup(t => t.GetToken()).Returns("expired-token");
 
@@ -103,11 +95,13 @@ public class SyncServiceTests
         client.Setup(c => c.GetPlatformWellActualAsync("expired-token"))
             .ThrowsAsync(new AemenersolUnauthorizedException());
 
+        var repository = new Mock<IPlatformWellRepository>();
+
         var hubContext = new Mock<IHubContext<SyncHub>>();
         var clientProxy = new Mock<IClientProxy>();
         hubContext.Setup(h => h.Clients.All).Returns(clientProxy.Object);
 
-        var service = new SyncService(client.Object, context, tokenStore.Object, hubContext.Object);
+        var service = new SyncService(client.Object, repository.Object, tokenStore.Object, hubContext.Object);
 
         await Assert.ThrowsAsync<AemenersolUnauthorizedException>(() => service.RunSyncAsync());
 
@@ -126,24 +120,27 @@ public class SyncServiceTests
                 It.IsAny<object?[]>(),
                 default),
             Times.Never);
+
+        repository.Verify(r => r.UpsertPlatformsAsync(It.IsAny<List<PlatformDto>>()), Times.Never);
     }
 
     [Fact]
     public async Task RunSyncAsync_UseDummyEndpoint_True_CallsDummyEndpoint()
     {
-        using var context = CreateInMemoryContext();
-
         var tokenStore = new Mock<ISyncTokenStore>();
         tokenStore.Setup(t => t.GetToken()).Returns("token");
 
         var client = new Mock<IAemenersolClient>();
         client.Setup(c => c.GetPlatformWellDummyAsync("token")).ReturnsAsync(new List<PlatformDto>());
 
+        var repository = new Mock<IPlatformWellRepository>();
+        repository.Setup(r => r.UpsertPlatformsAsync(It.IsAny<List<PlatformDto>>())).ReturnsAsync(EmptyUpsertResult);
+
         var hubContext = new Mock<IHubContext<SyncHub>>();
         var clientProxy = new Mock<IClientProxy>();
         hubContext.Setup(h => h.Clients.All).Returns(clientProxy.Object);
 
-        var service = new SyncService(client.Object, context, tokenStore.Object, hubContext.Object);
+        var service = new SyncService(client.Object, repository.Object, tokenStore.Object, hubContext.Object);
 
         await service.RunSyncAsync(useDummyEndpoint: true);
 
