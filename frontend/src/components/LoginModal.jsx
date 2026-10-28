@@ -21,13 +21,15 @@ export default function LoginModal({ onLogin }) {
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h2>Log in to Aemenersol</h2>
+        <div className="modal-mark">AE</div>
+        <h2>Login to Dashboard</h2>
+        <p className="modal-subtitle">Sign in to view and sync Aemenersol platform &amp; well data.</p>
         <form onSubmit={handleSubmit}>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Log in'}
+          <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
+            {loading ? 'Logging in…' : 'Log in'}
           </button>
         </form>
-        {error && <p className="error">{error}</p>}
+        {error && <p className="modal-error">{error}</p>}
       </div>
     </div>
   )

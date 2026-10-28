@@ -2,7 +2,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import Dashboard from './components/Dashboard'
 import LoginModal from './components/LoginModal'
-import SkeletonTable from './components/SkeletonTable'
 import { createSyncConnection } from './api/signalr'
 import * as api from './api/client'
 
@@ -75,24 +74,31 @@ export default function App() {
 
   if (checkingStatus) return null
 
+  if (isAuthenticated) {
+    return (
+      <Dashboard
+        platforms={platforms}
+        lastSynced={lastSynced}
+        onSync={handleSync}
+        onLogout={handleLogout}
+        syncing={syncing}
+      />
+    )
+  }
+
   return (
-    <div className="app-root">
-      {isAuthenticated ? (
+    <>
+      <div className="blurred-backdrop">
         <Dashboard
-          platforms={platforms}
-          lastSynced={lastSynced}
-          onSync={handleSync}
-          onLogout={handleLogout}
-          syncing={syncing}
+          platforms={[]}
+          lastSynced={null}
+          onSync={() => {}}
+          onLogout={() => {}}
+          syncing={false}
+          skeleton
         />
-      ) : (
-        <>
-          <div className="blurred-background">
-            <SkeletonTable />
-          </div>
-          <LoginModal onLogin={handleLogin} />
-        </>
-      )}
-    </div>
+      </div>
+      <LoginModal onLogin={handleLogin} />
+    </>
   )
 }
