@@ -1,0 +1,21 @@
+[
+  {
+    "id": 11,
+    "uniqueName": "Platform1",
+    "latitude": 1.012,
+    "longitude": 0.1231,
+    "createdAt": "2010-01-12T01:10:24.123",
+    "updatedAt": "2010-01-12T01:10:24.123",
+    "well": [
+      {
+        "id": 1,
+        "platformId": 11,
+        "uniqueName": "Well11",
+        "latitude": 37.06257,
+        "longitude": 18.406885,
+        "createdAt": "2017-11-01T02:41:00",
+        "updatedAt": "2018-08-04T02:16:42"
+      }
+    ]
+  }
+]
