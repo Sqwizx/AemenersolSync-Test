@@ -20,8 +20,6 @@ builder.Services.AddHttpClient<IAemenersolClient, AemenersolClient>(client =>
     client.BaseAddress = new Uri(builder.Configuration["Aemenersol:BaseUrl"]!);
 });
 
-builder.Services.AddScoped<IPlatformWellRepository, PlatformWellRepository>();
-
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
