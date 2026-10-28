@@ -1,6 +1,10 @@
 // frontend/src/components/PlatformTable.jsx
 import { useState, Fragment } from 'react'
 
+function formatDate(value) {
+  return value ? new Date(value).toLocaleDateString() : '—'
+}
+
 function WellsPanel({ wells }) {
   if (!wells || wells.length === 0) {
     return <div className="wells-empty">No wells recorded for this platform.</div>
@@ -13,6 +17,7 @@ function WellsPanel({ wells }) {
           <th>Well</th>
           <th>Latitude</th>
           <th>Longitude</th>
+          <th>Created</th>
           <th>Updated</th>
         </tr>
       </thead>
@@ -22,9 +27,8 @@ function WellsPanel({ wells }) {
             <td className="col-name">{well.uniqueName ?? '—'}</td>
             <td className="col-num">{well.latitude ?? '—'}</td>
             <td className="col-num">{well.longitude ?? '—'}</td>
-            <td className="col-num">
-              {well.updatedAt ? new Date(well.updatedAt).toLocaleDateString() : '—'}
-            </td>
+            <td className="col-num">{formatDate(well.createdAt)}</td>
+            <td className="col-num">{formatDate(well.updatedAt)}</td>
           </tr>
         ))}
       </tbody>
@@ -59,6 +63,7 @@ export default function PlatformTable({ platforms }) {
           <th>Platform</th>
           <th>Latitude</th>
           <th>Longitude</th>
+          <th>Created</th>
           <th>Wells</th>
         </tr>
       </thead>
@@ -78,13 +83,14 @@ export default function PlatformTable({ platforms }) {
                 <td className="col-name">{platform.uniqueName ?? '—'}</td>
                 <td className="col-num">{platform.latitude ?? '—'}</td>
                 <td className="col-num">{platform.longitude ?? '—'}</td>
+                <td className="col-num">{formatDate(platform.createdAt)}</td>
                 <td>
                   <span className={`well-badge ${wellCount === 0 ? 'is-zero' : ''}`}>{wellCount}</span>
                 </td>
               </tr>
               {isOpen && (
                 <tr className="row-wells">
-                  <td colSpan={5}>
+                  <td colSpan={6}>
                     <WellsPanel wells={platform.wells} />
                   </td>
                 </tr>

@@ -172,6 +172,13 @@
   font-weight: 500;
 }
 
+.panel-sync {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
 .last-synced {
   display: flex;
   align-items: center;

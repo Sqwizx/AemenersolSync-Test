@@ -9,6 +9,7 @@ export default function SkeletonTable() {
           <th>Platform</th>
           <th>Latitude</th>
           <th>Longitude</th>
+          <th>Created</th>
           <th>Wells</th>
         </tr>
       </thead>
@@ -19,6 +20,7 @@ export default function SkeletonTable() {
             <td><div className="skeleton-bar" /></td>
             <td><div className="skeleton-bar" style={{ width: '40%' }} /></td>
             <td><div className="skeleton-bar" style={{ width: '40%' }} /></td>
+            <td><div className="skeleton-bar" style={{ width: '50%' }} /></td>
             <td><div className="skeleton-bar" style={{ width: '20%' }} /></td>
           </tr>
         ))}
