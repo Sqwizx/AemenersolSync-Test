@@ -24,9 +24,6 @@ export default function Dashboard({ platforms, lastSynced, onSync, onLogout, syn
           </div>
         </div>
         <div className="topbar-actions">
-          <button className="btn btn-primary" onClick={onSync} disabled={syncing || skeleton}>
-            {syncing ? 'Syncing…' : 'Sync Now'}
-          </button>
           <button className="btn btn-ghost" onClick={onLogout} disabled={skeleton}>
             Logout
           </button>
@@ -44,16 +41,21 @@ export default function Dashboard({ platforms, lastSynced, onSync, onLogout, syn
                   : 'Platform and well records from Aemenersol'}
               </p>
             </div>
-            <span className={`last-synced ${formatted ? '' : 'is-pending'}`}>
-              <span className="last-synced-dot" />
-              {formatted ? (
-                <>
-                  Last sync <strong>{formatted}</strong>
-                </>
-              ) : (
-                'Not yet synced'
-              )}
-            </span>
+            <div className="panel-sync">
+              <button className="btn btn-primary" onClick={onSync} disabled={syncing || skeleton}>
+                {syncing ? 'Syncing…' : 'Sync Now'}
+              </button>
+              <span className={`last-synced ${formatted ? '' : 'is-pending'}`}>
+                <span className="last-synced-dot" />
+                {formatted ? (
+                  <>
+                    Last sync <strong>{formatted}</strong>
+                  </>
+                ) : (
+                  'Not yet synced'
+                )}
+              </span>
+            </div>
           </div>
 
           {skeleton ? <SkeletonTable /> : <PlatformTable platforms={platforms} />}

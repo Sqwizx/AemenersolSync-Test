@@ -44,8 +44,6 @@ public class SyncBackgroundService : BackgroundService
             }
             catch (AemenersolUnauthorizedException)
             {
-                // Already cleared the token and broadcast "unauthorized" inside SyncService.
-                // Swallow here so the timer loop keeps running on the next tick.
                 _logger.LogWarning("Background sync tick: upstream session expired.");
             }
             catch (Exception ex)
