@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AemenersolSync.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261028041535_InitialCreate")]
+    [Migration("20261028064601_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -28,10 +28,7 @@ namespace AemenersolSync.Api.Migrations
             modelBuilder.Entity("AemenersolSync.Api.Models.Platform", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -56,10 +53,7 @@ namespace AemenersolSync.Api.Migrations
             modelBuilder.Entity("AemenersolSync.Api.Models.Well", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");

@@ -35,6 +35,15 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<ISyncTokenStore, SessionSyncTokenStore>();
 builder.Services.AddScoped<ISyncService, SyncService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -49,6 +58,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.UseSession();
+app.UseCors("Frontend");
 app.MapHub<SyncHub>("/hubs/sync");
 
 app.MapControllers();
