@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using AemenersolSync.Api.Data;
+using AemenersolSync.Api.Hubs;
 using AemenersolSync.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,19 @@ builder.Services.AddHttpClient<IAemenersolClient, AemenersolClient>(client =>
 
 builder.Services.AddScoped<IPlatformWellRepository, PlatformWellRepository>();
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+});
+builder.Services.AddSignalR();
+builder.Services.AddScoped<ISyncTokenStore, SessionSyncTokenStore>();
+builder.Services.AddScoped<ISyncService, SyncService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -33,6 +47,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseSession();
+app.MapHub<SyncHub>("/hubs/sync");
 
 app.MapControllers();
 
