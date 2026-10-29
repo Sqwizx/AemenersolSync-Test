@@ -29,7 +29,9 @@ different port, update those two constants accordingly.
 Credentials and the API base URL are read from `appsettings.json`
 (`Aemenersol:BaseUrl`/`Username`/`Password`) — there are no credential fields in the
 login UI; the backend logs in with this fixed server-side configuration on the user's
-behalf.
+behalf. `Username`/`Password` ship as `<replace-here>` placeholders; replace them with
+real test credentials before running, or the login button (and `/api/auth/login`)
+will fail.
 
 A Swagger UI is also available while running in Development, at
 `https://localhost:7208/swagger/index.html` — useful for exercising the API endpoints
