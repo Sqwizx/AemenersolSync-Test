@@ -18,6 +18,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
     {
         try
