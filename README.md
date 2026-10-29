@@ -96,3 +96,12 @@ Platform loop when `GET /api/sync/data` serializes the graph).
 
 ## Time spent
 
+~12 hours total:
+
+| Area | Hours | Notes |
+|---|---|---|
+| MVP (EF Core Code First, login → fetch → upsert, defensive deserialization, controllers) | 5.5 | entity/migration design, the provided HTTP client with null-safe DTOs, the upsert-by-id repository, auth/sync controllers. Includes debugging time against the live API and LocalDB. |
+| Additional Feature | 1.5 | Background Scheduler (token cache, SignalR server-side wiring) |
+| Frontend | 3.5 | React scaffold, dashboard, login modal, table, SignalR client, styling. |
+| Tests | 1.5 | Added service tests and two regression tests added specifically because bugs were found during development - IDENTITY/JSON-cycle bugs had no coverage until found. |
+| **Total** | **12** | Besides MVP development time and debugging time where some bugs were found during the development  |
