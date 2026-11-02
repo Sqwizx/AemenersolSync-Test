@@ -37,4 +37,17 @@ public class AppDbContextModelTests
 
         Assert.Equal(ValueGenerated.Never, idProperty!.ValueGenerated);
     }
+
+    [Theory]
+    [InlineData(typeof(Platform))]
+    [InlineData(typeof(Well))]
+    public void Model_MapsInheritedAuditTimestamps(Type entityClrType)
+    {
+        using var context = CreateInMemoryContext();
+
+        var entityType = context.Model.FindEntityType(entityClrType);
+
+        Assert.NotNull(entityType!.FindProperty(nameof(AbstractModel.CreatedAt)));
+        Assert.NotNull(entityType.FindProperty(nameof(AbstractModel.UpdatedAt)));
+    }
 }
