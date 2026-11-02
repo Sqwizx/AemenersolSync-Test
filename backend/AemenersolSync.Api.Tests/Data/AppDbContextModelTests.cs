@@ -47,7 +47,7 @@ public class AppDbContextModelTests
 
         var entityType = context.Model.FindEntityType(entityClrType);
 
-        Assert.NotNull(entityType!.FindProperty(nameof(AbstractModel.CreatedAt)));
-        Assert.NotNull(entityType.FindProperty(nameof(AbstractModel.UpdatedAt)));
+        Assert.NotNull(entityType!.FindProperty(nameof(AuditableEntity.CreatedAt)));
+        Assert.NotNull(entityType.FindProperty(nameof(AuditableEntity.UpdatedAt)));
     }
 }

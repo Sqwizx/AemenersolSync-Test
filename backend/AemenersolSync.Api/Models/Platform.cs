@@ -1,6 +1,6 @@
 namespace AemenersolSync.Api.Models;
 
-public class Platform : AbstractModel
+public class Platform : AuditableEntity
 {
     public int Id { get; set; }
     public string? UniqueName { get; set; }

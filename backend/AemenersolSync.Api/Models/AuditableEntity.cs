@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace AemenersolSync.Api.Models;
 
 [NotMapped]
-public abstract class AbstractModel
+public abstract class AuditableEntity
 {
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

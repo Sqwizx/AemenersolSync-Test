@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace AemenersolSync.Api.Models;
 
-public class Well : AbstractModel
+public class Well : AuditableEntity
 {
     public int Id { get; set; }
     public int PlatformId { get; set; }
