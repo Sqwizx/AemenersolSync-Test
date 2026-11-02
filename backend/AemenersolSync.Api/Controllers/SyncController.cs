@@ -38,14 +38,14 @@ public class SyncController : ControllerBase
     }
 
     [HttpGet("data")]
-    public async Task<IActionResult> GetData()
+    public async Task<IActionResult> GetData([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         if (_tokenStore.GetToken() is null)
         {
             return Unauthorized();
         }
 
-        var platforms = await _repository.GetAllPlatformsWithWellsAsync();
-        return Ok(platforms);
+        var result = await _repository.GetPlatformsWithWellsAsync(page, pageSize);
+        return Ok(result);
     }
 }

@@ -1,5 +1,5 @@
 // frontend/src/App.jsx
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import Dashboard from './components/Dashboard'
 import LoginModal from './components/LoginModal'
 import { createSyncConnection } from './api/signalr'
@@ -8,14 +8,24 @@ import * as api from './api/client'
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [platforms, setPlatforms] = useState([])
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
+  const [totalCount, setTotalCount] = useState(0)
   const [lastSynced, setLastSynced] = useState(null)
   const [syncing, setSyncing] = useState(false)
   const [checkingStatus, setCheckingStatus] = useState(true)
 
-  const refreshData = useCallback(async () => {
+  const pagingRef = useRef({ page, pageSize })
+  pagingRef.current = { page, pageSize }
+
+  const refreshData = useCallback(async (targetPage) => {
     try {
-      const data = await api.getSyncData()
-      setPlatforms(data ?? [])
+      const { page: currentPage, pageSize: currentPageSize } = pagingRef.current
+      const data = await api.getSyncData(targetPage ?? currentPage, currentPageSize)
+      setPlatforms(data?.items ?? [])
+      setPage(data?.page ?? 1)
+      setPageSize(data?.pageSize ?? currentPageSize)
+      setTotalCount(data?.totalCount ?? 0)
     } catch (err) {
       if (err instanceof api.UnauthorizedError) {
         setIsAuthenticated(false)
@@ -27,7 +37,7 @@ export default function App() {
     api.getStatus()
       .then((status) => {
         setIsAuthenticated(status.authenticated)
-        if (status.authenticated) refreshData()
+        if (status.authenticated) refreshData(1)
       })
       .finally(() => setCheckingStatus(false))
   }, [refreshData])
@@ -72,6 +82,10 @@ export default function App() {
     }
   }
 
+  async function handlePageChange(nextPage) {
+    await refreshData(nextPage)
+  }
+
   if (checkingStatus) return null
 
   if (isAuthenticated) {
@@ -82,6 +96,10 @@ export default function App() {
         onSync={handleSync}
         onLogout={handleLogout}
         syncing={syncing}
+        page={page}
+        pageSize={pageSize}
+        totalCount={totalCount}
+        onPageChange={handlePageChange}
       />
     )
   }

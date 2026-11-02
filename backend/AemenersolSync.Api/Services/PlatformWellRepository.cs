@@ -72,12 +72,24 @@ public class PlatformWellRepository : IPlatformWellRepository
         return new UpsertResult(platformsInserted, platformsUpdated, wellsInserted, wellsUpdated);
     }
 
-    public async Task<List<Platform>> GetAllPlatformsWithWellsAsync()
+    private const int MaxPageSize = 100;
+
+    public async Task<PagedResult<Platform>> GetPlatformsWithWellsAsync(int page, int pageSize)
     {
-        return await _context.Platforms
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, MaxPageSize);
+
+        var totalCount = await _context.Platforms.CountAsync();
+
+        var items = await _context.Platforms
             .Include(p => p.Wells)
             .AsNoTracking()
+            .OrderBy(p => p.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return new PagedResult<Platform>(items, page, pageSize, totalCount);
     }
 
     private static void ApplyPlatformFields(Platform platform, PlatformDto dto)

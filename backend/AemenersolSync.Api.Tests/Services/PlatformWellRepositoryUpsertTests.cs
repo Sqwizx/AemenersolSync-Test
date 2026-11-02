@@ -164,7 +164,7 @@ public class PlatformWellRepositoryUpsertTests
     }
 
     [Fact]
-    public async Task GetAllPlatformsWithWellsAsync_ReturnsPlatformsWithNestedWells()
+    public async Task GetPlatformsWithWellsAsync_ReturnsPageMetadataAndNestedWells()
     {
         using var context = CreateInMemoryContext();
         var platform = new Platform { Id = 1, UniqueName = "P1", Latitude = 1.1, Longitude = 2.2 };
@@ -174,10 +174,12 @@ public class PlatformWellRepositoryUpsertTests
         await context.SaveChangesAsync();
         var repo = new PlatformWellRepository(context);
 
-        var result = await repo.GetAllPlatformsWithWellsAsync();
+        var result = await repo.GetPlatformsWithWellsAsync(page: 1, pageSize: 20);
 
-        Assert.Single(result);
-        var returned = result[0];
+        Assert.Equal(1, result.Page);
+        Assert.Equal(20, result.PageSize);
+        Assert.Equal(1, result.TotalCount);
+        var returned = Assert.Single(result.Items);
         Assert.Equal(1, returned.Id);
         Assert.Equal("P1", returned.UniqueName);
         Assert.Equal(2, returned.Wells.Count);

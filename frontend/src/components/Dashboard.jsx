@@ -10,8 +10,20 @@ function formatLastSynced(lastSynced) {
   })
 }
 
-export default function Dashboard({ platforms, lastSynced, onSync, onLogout, syncing, skeleton = false }) {
+export default function Dashboard({
+  platforms,
+  lastSynced,
+  onSync,
+  onLogout,
+  syncing,
+  skeleton = false,
+  page = 1,
+  pageSize = 20,
+  totalCount = 0,
+  onPageChange,
+}) {
   const formatted = formatLastSynced(lastSynced)
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
 
   return (
     <div className="app-shell">
@@ -59,6 +71,28 @@ export default function Dashboard({ platforms, lastSynced, onSync, onLogout, syn
           </div>
 
           {skeleton ? <SkeletonTable /> : <PlatformTable platforms={platforms} />}
+
+          {!skeleton && totalCount > 0 && (
+            <div className="pager">
+              <button
+                className="btn btn-ghost"
+                onClick={() => onPageChange?.(page - 1)}
+                disabled={page <= 1}
+              >
+                Prev
+              </button>
+              <span className="pager-status">
+                Page {page} of {totalPages}
+              </span>
+              <button
+                className="btn btn-ghost"
+                onClick={() => onPageChange?.(page + 1)}
+                disabled={page >= totalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </main>
     </div>

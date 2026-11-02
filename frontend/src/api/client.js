@@ -37,8 +37,8 @@ export function getStatus() {
   return request('/api/auth/status')
 }
 
-export function getSyncData() {
-  return request('/api/sync/data')
+export function getSyncData(page = 1, pageSize = 20) {
+  return request(`/api/sync/data?page=${page}&pageSize=${pageSize}`)
 }
 
 export function triggerSync() {

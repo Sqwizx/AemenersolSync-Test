@@ -208,6 +208,21 @@
   box-shadow: 0 0 0 3px rgba(155, 147, 136, 0.15);
 }
 
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 0 4px;
+}
+
+.pager-status {
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 /* ---------- Table ---------- */
 
 .platform-table {

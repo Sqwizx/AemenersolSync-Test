@@ -9,5 +9,5 @@ public interface IPlatformWellRepository
 {
     Task<UpsertResult> UpsertPlatformsAsync(List<PlatformDto> platforms);
 
-    Task<List<Platform>> GetAllPlatformsWithWellsAsync();
+    Task<PagedResult<Platform>> GetPlatformsWithWellsAsync(int page, int pageSize);
 }
