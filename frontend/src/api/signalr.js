@@ -1,7 +1,7 @@
 // frontend/src/api/signalr.js
 import * as signalR from '@microsoft/signalr'
 
-const HUB_URL = 'https://localhost:7208/hubs/sync'
+const HUB_URL = 'http://localhost:5281/hubs/sync'
 
 export function createSyncConnection({ onSyncCompleted, onUnauthorized }) {
   const connection = new signalR.HubConnectionBuilder()

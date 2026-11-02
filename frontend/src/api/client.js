@@ -1,5 +1,5 @@
 // frontend/src/api/client.js
-const BASE_URL = 'https://localhost:7208' // backend HTTPS port from backend/AemenersolSync.Api/Properties/launchSettings.json ("https" profile)
+const BASE_URL = 'http://localhost:5281' // backend HTTP port from backend/AemenersolSync.Api/Properties/launchSettings.json
 
 export class UnauthorizedError extends Error {}
 

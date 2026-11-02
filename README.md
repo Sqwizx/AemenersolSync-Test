@@ -20,11 +20,10 @@ dotnet ef database update   # creates the AemenersolSync LocalDB database
 dotnet run
 ```
 
-The `https` launch profile (`backend/AemenersolSync.Api/Properties/launchSettings.json`)
-serves on `https://localhost:7208` (and `http://localhost:5281`). The frontend's
-`frontend/src/api/client.js` (`BASE_URL`) and `frontend/src/api/signalr.js` (`HUB_URL`)
-are already pointed at `https://localhost:7208` to match. If your machine assigns a
-different port, update those two constants accordingly.
+The `http` launch profile (`backend/AemenersolSync.Api/Properties/launchSettings.json`)
+serves on `http://localhost:5281`. The frontend's `frontend/src/api/client.js`
+(`BASE_URL`) and `frontend/src/api/signalr.js` (`HUB_URL`) are already pointed there.
+If your machine assigns a different port, update those two constants accordingly.
 
 Credentials and the API base URL are read from `appsettings.json`
 (`Aemenersol:BaseUrl`/`Username`/`Password`) — there are no credential fields in the
@@ -32,7 +31,7 @@ login UI; the backend logs in with this fixed server-side configuration on the u
 behalf.
 
 A Swagger UI is also available while running in Development, at
-`https://localhost:7208/swagger/index.html` — useful for exercising the API endpoints
+`http://localhost:5281/swagger/index.html` — useful for exercising the API endpoints
 directly (login → sync → data) without the React frontend.
 
 ## Running the frontend
