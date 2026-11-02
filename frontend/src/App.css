@@ -131,6 +131,29 @@
   width: 100%;
 }
 
+.btn-sync {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sync-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ---------- Content / desktop frame ---------- */
 
 .content {
@@ -223,7 +246,53 @@
   white-space: nowrap;
 }
 
-/* ---------- Table ---------- */
+/* ---------- Platform / wells workspace ---------- */
+
+.dashboard-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.9fr);
+}
+
+.platform-pane {
+  min-width: 0;
+}
+
+.wells-pane {
+  min-width: 0;
+  border-left: 1px solid var(--line);
+  background: var(--wash);
+}
+
+.wells-pane-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.wells-pane-header > div {
+  min-width: 0;
+}
+
+.wells-pane-header h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Platform table ---------- */
+
+.platform-table-region {
+  position: relative;
+  min-height: 280px;
+}
 
 .platform-table {
   width: 100%;
@@ -232,7 +301,7 @@
 
 .platform-table thead th {
   text-align: left;
-  padding: 11px 28px;
+  padding: 11px 20px;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
@@ -243,13 +312,8 @@
   border-bottom: 1px solid var(--line);
 }
 
-.platform-table thead th:first-child {
-  width: 36px;
-  padding-right: 0;
-}
-
 .platform-table tbody td {
-  padding: 14px 28px;
+  padding: 14px 20px;
   font-size: 14px;
   color: var(--ink);
   border-bottom: 1px solid var(--line-soft);
@@ -263,7 +327,7 @@
   transition: background 0.1s ease;
 }
 
-.platform-table tbody tr.row-platform.is-expandable {
+.platform-table tbody tr.row-platform.is-selectable {
   cursor: pointer;
 }
 
@@ -271,8 +335,14 @@
   background: var(--wash);
 }
 
-.platform-table tbody tr.row-platform.is-open {
-  background: var(--wash);
+.platform-table tbody tr.row-platform.is-selected {
+  background: var(--rust-wash);
+  box-shadow: inset 3px 0 0 var(--rust);
+}
+
+.platform-table tbody tr.row-platform:focus-visible {
+  outline: 2px solid var(--rust);
+  outline-offset: -2px;
 }
 
 .platform-table .col-name {
@@ -285,77 +355,80 @@
   color: var(--ink-soft);
 }
 
-.col-chevron {
-  width: 36px;
-  padding-left: 28px !important;
-  padding-right: 0 !important;
-}
-
-.chevron {
-  display: inline-block;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--ink-faint);
-  transform: rotate(0deg);
-  transition: transform 0.15s ease;
-  line-height: 1;
-}
-
-.chevron.is-open {
-  transform: rotate(90deg);
-  color: var(--rust);
-}
-
-/* ---------- Expanded wells sub-panel ---------- */
-
-.row-wells td {
-  padding: 0;
-  background: var(--wash);
-  border-bottom: 1px solid var(--line-soft);
-}
-
 .wells-empty {
-  padding: 16px 28px 20px 64px;
+  padding: 24px 22px;
   font-size: 13px;
   color: var(--ink-faint);
+  line-height: 1.5;
 }
 
-.well-table {
-  width: 100%;
-  border-collapse: collapse;
+.wells-empty-selection {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  text-align: center;
+  padding: 28px;
 }
 
-.well-table thead th {
-  text-align: left;
-  padding: 8px 28px;
+.well-list {
+  display: grid;
+  gap: 10px;
+  max-height: 520px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding: 14px;
+}
+
+.well-card {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  transition: outline-color 0.15s ease;
+}
+
+.well-card:hover {
+  outline-color: rgba(181, 70, 30, 0.5);
+}
+
+.well-card h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.well-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  margin: 14px 0 0;
+}
+
+.well-details div {
+  min-width: 0;
+}
+
+.well-details dt {
+  color: var(--ink-faint);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--ink-faint);
-  border-top: 1px solid var(--line-soft);
-  border-bottom: 1px solid var(--line-soft);
 }
 
-.well-table tbody td {
-  padding: 10px 28px;
-  font-size: 13px;
+.well-details dd {
+  margin: 3px 0 0;
   color: var(--ink-soft);
-}
-
-.well-table thead th:first-child,
-.well-table tbody td:first-child {
-  padding-left: 64px;
-}
-
-.well-table tbody tr:last-child td {
-  padding-bottom: 16px;
-}
-
-.well-table .col-name {
-  font-weight: 600;
-  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .well-badge {
@@ -382,6 +455,21 @@
   text-align: center;
   color: var(--ink-faint);
   font-size: 14px;
+}
+
+.table-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(2px);
+  color: var(--rust-dark);
+  font-size: 13px;
+  font-weight: 800;
 }
 
 /* ---------- Skeleton ---------- */
@@ -475,6 +563,17 @@
   font-weight: 600;
 }
 
+@media (max-width: 900px) {
+  .dashboard-split {
+    grid-template-columns: 1fr;
+  }
+
+  .wells-pane {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+}
+
 @media (max-width: 720px) {
   .topbar {
     padding: 16px 20px;
@@ -488,5 +587,23 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+  }
+
+  .well-list {
+    max-height: none;
+  }
+
+  .platform-table {
+    min-width: 650px;
+  }
+
+  .platform-pane {
+    overflow-x: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sync-spinner {
+    animation-duration: 1.8s;
   }
 }

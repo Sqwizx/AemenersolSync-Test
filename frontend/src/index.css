@@ -13,6 +13,10 @@ body {
   padding: 0;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background: #ffffff;
   color: #171310;

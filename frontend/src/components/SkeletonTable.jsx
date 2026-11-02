@@ -5,7 +5,6 @@ export default function SkeletonTable() {
     <table className="platform-table skeleton">
       <thead>
         <tr>
-          <th aria-hidden="true"></th>
           <th>Platform</th>
           <th>Latitude</th>
           <th>Longitude</th>
@@ -16,7 +15,6 @@ export default function SkeletonTable() {
       <tbody>
         {rows.map((_, i) => (
           <tr key={i}>
-            <td></td>
             <td><div className="skeleton-bar" /></td>
             <td><div className="skeleton-bar" style={{ width: '40%' }} /></td>
             <td><div className="skeleton-bar" style={{ width: '40%' }} /></td>

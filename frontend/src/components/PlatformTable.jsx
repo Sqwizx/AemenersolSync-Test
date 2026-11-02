@@ -1,104 +1,62 @@
-// frontend/src/components/PlatformTable.jsx
-import { useState, Fragment } from 'react'
-
 function formatDate(value) {
   return value ? new Date(value).toLocaleDateString() : '—'
 }
 
-function WellsPanel({ wells }) {
-  if (!wells || wells.length === 0) {
-    return <div className="wells-empty">No wells recorded for this platform.</div>
+export default function PlatformTable({ platforms, selectedPlatformId, onSelect, loading = false }) {
+  function handleKeyDown(event, platformId) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onSelect?.(platformId)
+    }
   }
 
   return (
-    <table className="well-table">
-      <thead>
-        <tr>
-          <th>Well</th>
-          <th>Latitude</th>
-          <th>Longitude</th>
-          <th>Created</th>
-          <th>Updated</th>
-        </tr>
-      </thead>
-      <tbody>
-        {wells.map((well) => (
-          <tr key={well.id}>
-            <td className="col-name">{well.uniqueName ?? '—'}</td>
-            <td className="col-num">{well.latitude ?? '—'}</td>
-            <td className="col-num">{well.longitude ?? '—'}</td>
-            <td className="col-num">{formatDate(well.createdAt)}</td>
-            <td className="col-num">{formatDate(well.updatedAt)}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )
-}
-
-export default function PlatformTable({ platforms }) {
-  const [expanded, setExpanded] = useState(() => new Set())
-
-  if (!platforms || platforms.length === 0) {
-    return <div className="empty-state">No platforms synced yet. Click "Sync Now" to pull data.</div>
-  }
-
-  function toggle(id) {
-    setExpanded((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
-      }
-      return next
-    })
-  }
-
-  return (
-    <table className="platform-table">
-      <thead>
-        <tr>
-          <th aria-hidden="true"></th>
-          <th>Platform</th>
-          <th>Latitude</th>
-          <th>Longitude</th>
-          <th>Created</th>
-          <th>Wells</th>
-        </tr>
-      </thead>
-      <tbody>
-        {platforms.map((platform) => {
-          const wellCount = platform.wells?.length ?? 0
-          const isOpen = expanded.has(platform.id)
-          return (
-            <Fragment key={platform.id}>
-              <tr
-                className={`row-platform ${isOpen ? 'is-open' : ''} ${wellCount > 0 ? 'is-expandable' : ''}`}
-                onClick={() => wellCount > 0 && toggle(platform.id)}
-              >
-                <td className="col-chevron">
-                  {wellCount > 0 && <span className={`chevron ${isOpen ? 'is-open' : ''}`}>›</span>}
-                </td>
-                <td className="col-name">{platform.uniqueName ?? '—'}</td>
-                <td className="col-num">{platform.latitude ?? '—'}</td>
-                <td className="col-num">{platform.longitude ?? '—'}</td>
-                <td className="col-num">{formatDate(platform.createdAt)}</td>
-                <td>
-                  <span className={`well-badge ${wellCount === 0 ? 'is-zero' : ''}`}>{wellCount}</span>
-                </td>
-              </tr>
-              {isOpen && (
-                <tr className="row-wells">
-                  <td colSpan={6}>
-                    <WellsPanel wells={platform.wells} />
+    <div className="platform-table-region" aria-busy={loading}>
+      {!platforms || platforms.length === 0 ? (
+        <div className="empty-state">No platforms synced yet. Click "Sync Now" to pull data.</div>
+      ) : (
+        <table className="platform-table">
+          <thead>
+            <tr>
+              <th>Platform</th>
+              <th>Latitude</th>
+              <th>Longitude</th>
+              <th>Created</th>
+              <th>Wells</th>
+            </tr>
+          </thead>
+          <tbody>
+            {platforms.map((platform) => {
+              const wellCount = platform.wells?.length ?? 0
+              const isSelected = selectedPlatformId === platform.id
+              return (
+                <tr
+                  key={platform.id}
+                  className={`row-platform is-selectable ${isSelected ? 'is-selected' : ''}`}
+                  onClick={() => onSelect?.(platform.id)}
+                  onKeyDown={(event) => handleKeyDown(event, platform.id)}
+                  tabIndex={0}
+                >
+                  <td className="col-name">{platform.uniqueName ?? '—'}</td>
+                  <td className="col-num">{platform.latitude ?? '—'}</td>
+                  <td className="col-num">{platform.longitude ?? '—'}</td>
+                  <td className="col-num">{formatDate(platform.createdAt)}</td>
+                  <td>
+                    <span className={`well-badge ${wellCount === 0 ? 'is-zero' : ''}`}>{wellCount}</span>
                   </td>
                 </tr>
-              )}
-            </Fragment>
-          )
-        })}
-      </tbody>
-    </table>
+              )
+            })}
+          </tbody>
+        </table>
+      )}
+
+      {loading && (
+        <div className="table-loading-overlay" role="status">
+          <span className="sync-spinner" aria-hidden="true" />
+          <span>Syncing platform data…</span>
+        </div>
+      )}
+    </div>
   )
 }
