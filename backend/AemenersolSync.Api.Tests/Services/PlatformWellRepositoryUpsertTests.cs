@@ -164,6 +164,22 @@ public class PlatformWellRepositoryUpsertTests
     }
 
     [Fact]
+    public async Task UpsertPlatformsAsync_LargeInput_ProcessesEveryBatchAndClearsTracking()
+    {
+        using var context = CreateInMemoryContext();
+        var repo = new PlatformWellRepository(context);
+        var platforms = Enumerable.Range(1, 101)
+            .Select(id => new PlatformDto { Id = id, UniqueName = $"P{id}", Well = new() })
+            .ToList();
+
+        var result = await repo.UpsertPlatformsAsync(platforms);
+
+        Assert.Equal(101, result.PlatformsInserted);
+        Assert.Equal(101, await context.Platforms.CountAsync());
+        Assert.Empty(context.ChangeTracker.Entries());
+    }
+
+    [Fact]
     public async Task GetPlatformsWithWellsAsync_ReturnsPageMetadataAndNestedWells()
     {
         using var context = CreateInMemoryContext();

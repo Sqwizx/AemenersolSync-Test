@@ -8,6 +8,7 @@ namespace AemenersolSync.Api.Services;
 
 public class PlatformWellRepository : IPlatformWellRepository
 {
+    private const int UpsertBatchSize = 100;
     private readonly AppDbContext _context;
     private readonly ILogger<PlatformWellRepository>? _logger;
 
@@ -19,10 +20,21 @@ public class PlatformWellRepository : IPlatformWellRepository
 
     public async Task<UpsertResult> UpsertPlatformsAsync(List<PlatformDto> platforms)
     {
-        var result = await UpsertRecordsAsync(platforms);
-        await _context.SaveChangesAsync();
+        int platformsInserted = 0, platformsUpdated = 0, wellsInserted = 0, wellsUpdated = 0;
 
-        return result;
+        foreach (var platformBatch in platforms.Chunk(UpsertBatchSize))
+        {
+            var result = await UpsertRecordsAsync(platformBatch);
+            await _context.SaveChangesAsync();
+            _context.ChangeTracker.Clear();
+
+            platformsInserted += result.PlatformsInserted;
+            platformsUpdated += result.PlatformsUpdated;
+            wellsInserted += result.WellsInserted;
+            wellsUpdated += result.WellsUpdated;
+        }
+
+        return new UpsertResult(platformsInserted, platformsUpdated, wellsInserted, wellsUpdated);
     }
 
     private async Task<UpsertResult> UpsertRecordsAsync(IReadOnlyCollection<PlatformDto> platforms)
