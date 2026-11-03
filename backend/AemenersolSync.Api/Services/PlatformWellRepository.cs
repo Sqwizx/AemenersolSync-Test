@@ -19,7 +19,39 @@ public class PlatformWellRepository : IPlatformWellRepository
 
     public async Task<UpsertResult> UpsertPlatformsAsync(List<PlatformDto> platforms)
     {
+        var result = await UpsertRecordsAsync(platforms);
+        await _context.SaveChangesAsync();
+
+        return result;
+    }
+
+    private async Task<UpsertResult> UpsertRecordsAsync(IReadOnlyCollection<PlatformDto> platforms)
+    {
         int platformsInserted = 0, platformsUpdated = 0, wellsInserted = 0, wellsUpdated = 0;
+
+        var platformIds = platforms
+            .Where(platform => platform.Id > 0)
+            .Select(platform => platform.Id)
+            .Distinct()
+            .ToArray();
+        var wellIds = platforms
+            .Where(platform => platform.Id > 0)
+            .SelectMany(platform => platform.Well)
+            .Where(well => well.Id > 0 && well.PlatformId > 0)
+            .Select(well => well.Id)
+            .Distinct()
+            .ToArray();
+
+        var platformsById = platformIds.Length == 0
+            ? new Dictionary<int, Platform>()
+            : await _context.Platforms
+                .Where(platform => platformIds.Contains(platform.Id))
+                .ToDictionaryAsync(platform => platform.Id);
+        var wellsById = wellIds.Length == 0
+            ? new Dictionary<int, Well>()
+            : await _context.Wells
+                .Where(well => wellIds.Contains(well.Id))
+                .ToDictionaryAsync(well => well.Id);
 
         foreach (var platformDto in platforms)
         {
@@ -29,11 +61,11 @@ public class PlatformWellRepository : IPlatformWellRepository
                 continue;
             }
 
-            var platform = await _context.Platforms.FindAsync(platformDto.Id);
-            if (platform is null)
+            if (!platformsById.TryGetValue(platformDto.Id, out var platform))
             {
                 platform = new Platform { Id = platformDto.Id };
                 _context.Platforms.Add(platform);
+                platformsById.Add(platform.Id, platform);
                 platformsInserted++;
             }
             else
@@ -51,11 +83,11 @@ public class PlatformWellRepository : IPlatformWellRepository
                     continue;
                 }
 
-                var well = await _context.Wells.FindAsync(wellDto.Id);
-                if (well is null)
+                if (!wellsById.TryGetValue(wellDto.Id, out var well))
                 {
                     well = new Well { Id = wellDto.Id, PlatformId = wellDto.PlatformId };
                     _context.Wells.Add(well);
+                    wellsById.Add(well.Id, well);
                     wellsInserted++;
                 }
                 else
@@ -66,8 +98,6 @@ public class PlatformWellRepository : IPlatformWellRepository
                 ApplyWellFields(well, wellDto);
             }
         }
-
-        await _context.SaveChangesAsync();
 
         return new UpsertResult(platformsInserted, platformsUpdated, wellsInserted, wellsUpdated);
     }
