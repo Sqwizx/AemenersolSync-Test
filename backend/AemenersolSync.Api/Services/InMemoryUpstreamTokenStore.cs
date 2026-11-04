@@ -1,6 +1,6 @@
 namespace AemenersolSync.Api.Services;
 
-public class InMemorySyncTokenCache
+public sealed class InMemoryUpstreamTokenStore : ISyncTokenStore
 {
     private string? _token;
     private readonly object _lock = new();
